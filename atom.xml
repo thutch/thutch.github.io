@@ -4,7 +4,7 @@
   <title><![CDATA[Datagrams on the Wings of Pigeons]]></title>
   <link href="http://thutch.github.io/atom.xml" rel="self"/>
   <link href="http://thutch.github.io/"/>
-  <updated>2013-12-16T23:24:54-06:00</updated>
+  <updated>2013-12-22T10:30:14-06:00</updated>
   <id>http://thutch.github.io/</id>
   <author>
     <name><![CDATA[Tim Hutchison]]></name>
@@ -12,6 +12,207 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[OO Recursive Search]]></title>
+    <link href="http://thutch.github.io/blog/2013/12/17/oo-recursive-search/"/>
+    <updated>2013-12-17T08:55:00-06:00</updated>
+    <id>http://thutch.github.io/blog/2013/12/17/oo-recursive-search</id>
+    <content type="html"><![CDATA[<p>This is a further exploration on the topic of OO Recursion.  In the last post, we looked at seeding Mancala wells.  In this post we&rsquo;ll look at searching for an object in an OO Recursive fashion.</p>
+
+<p>To start things off, here is our simple Node class;</p>
+
+<figure class='code'><figcaption><span>Simple Node class</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Node</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:name</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
+</span><span class='line'>      <span class="vi">@children</span> <span class="o">=</span> <span class="nb">Array</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@children</span> <span class="o">&lt;&lt;</span> <span class="n">child</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">find_node_named</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">if</span> <span class="vi">@name</span> <span class="o">==</span> <span class="nb">name</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nb">self</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="vi">@children</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
+</span><span class='line'>          <span class="n">found</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">find_node_named</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">if</span><span class="p">(</span><span class="n">found</span> <span class="o">!=</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">return</span> <span class="n">found</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="kp">nil</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our Node class has a name and keeps a collection of its children.  There is the add_child method that adds a child to its collection of children.</p>
+
+<p>The find_node_named method will be of most interest to us.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">find_node_named</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="vi">@name</span> <span class="o">==</span> <span class="nb">name</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nb">self</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="vi">@children</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">found</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">find_node_named</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span><span class="p">(</span><span class="n">found</span> <span class="o">!=</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">found</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="kp">nil</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This method has one parameter, name,  that is used to look for the node of interest.</p>
+
+<p>The first thing that is done is checking to see if this node is the one being searched for.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">if</span> <span class="vi">@name</span> <span class="o">==</span> <span class="nb">name</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nb">self</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is the base case. If the parameter name and the node&rsquo;s name match, then self is returned and the search is complete. The object knows about itself and can determine if it is the object being searched for or not.</p>
+
+<p>If this is not the object we are looking for then the search continues on the objects children.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@children</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">found</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">find_node_named</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">found</span> <span class="o">!=</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">found</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The nodes children are iterated over, sending the find_node_named to each one till it is found or there are no more children. If the node is found then the found node is immediately returned to the caller.</p>
+
+<p>The last line in the find_node_named method returns nil if the node is not found.  When the the inidtial test of name against the current node&rsquo;s @name identifier do not match, the method will then iterate over the objects children.  If the iteration over the children does not find the node identified as the parameter name, then nil is returned.</p>
+
+<p>Pretty straight forward.</p>
+
+<p>Next lets add a leaf node.</p>
+
+<figure class='code'><figcaption><span>LeafNode</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">LeafNode</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:id</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@id</span> <span class="o">=</span> <span class="nb">name</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1">#do nothing</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">find_node_named</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="vi">@id</span> <span class="o">==</span> <span class="nb">name</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nb">self</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>          <span class="kp">nil</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The LeafNode provides the same api&rsquo;s as the Node. Though as a leaf node, it will not have children  and the add_child method will do nothing, a no-op.</p>
+
+<p>Just to make it more interesting,  instead of an instvar named @name to identify the node,  the instvar for the identifier has been changed to @id.</p>
+
+<p>Based upon the way we wrote our original find_node_named method in Node,  we won&rsquo;t have to handle the case of a LeafNode&rsquo;s identifier @id when searching through the Node&rsquo;s collection of children.</p>
+
+<p>The LeafNode demonstrates polymorphic behavior of the Node for the search.  A different object (LeafNode) has been thrown into the data structure and for the purpose of the search provides similar behavior as Node.  Since the Node and LeafNode know how to test themselves and search their children, in the case of Node, then the addition of the LeafNode doesn&rsquo;t disrupt the original Node
+find_node_named method to handle LeafNode.</p>
+
+<p>OO recursion can make search complex structures much simpler when taking advantage of the power of the object and data encapsulation.  Let the objects do the work.</p>
+
+<p>Here&rsquo;s a link to the example provided; <a href=https://gist.github.com/thutch/8084791>OO Recursive Search gist</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object-Oriented Recursion]]></title>
